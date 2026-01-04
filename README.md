@@ -4,7 +4,8 @@ Berechne deine GPU-Token-Kosten und Gewinnmarge in Echtzeit.
 
 ## 🚀 Live Demo
 
-[token-kosten-rechner.pages.dev](https://devmatrose.github.io/token-kosten-rechner/)
+
+[https://devmatrose.github.io/token-kosten-rechner/](https://devmatrose.github.io/token-kosten-rechner/)
 
 ## 📋 Was macht es?
 
