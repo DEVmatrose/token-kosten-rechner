@@ -1,5 +1,8 @@
 # Token Kosten-Rechner
 
+<img width="1072" height="1178" alt="image" src="https://github.com/user-attachments/assets/7bdcf1eb-0448-41db-b16d-ab2a8550b9c5" />
+
+
 Berechne deine GPU-Token-Kosten und Gewinnmarge in Echtzeit.
 
 ## 🚀 Live Demo
