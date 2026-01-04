@@ -57,6 +57,27 @@
                                 </h3>
                                 
                                 <div class="space-y-4">
+                                    <!-- Anbieter Preset Dropdown -->
+                                    <div>
+                                        <label class="text-white text-sm font-medium mb-2 flex items-center justify-between">
+                                            <span>🎯 Anbieter Schnellwahl (Presets)</span>
+                                            <span v-if="lastPriceUpdate" class="text-green-400 text-xs font-normal">
+                                                🔄 Live-Daten
+                                            </span>
+                                        </label>
+                                        <select 
+                                            @change="applyPreset" 
+                                            v-model="selectedPreset" 
+                                            :disabled="isLoadingPrices"
+                                            class="w-full bg-slate-700 text-white rounded-lg px-4 py-3 border border-slate-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50"
+                                        >
+                                            <option :value="null">{{ isLoadingPrices ? 'Lade Preise...' : '-- Manuelle Eingabe --' }}</option>
+                                            <option v-for="p in anbieterPresets" :key="p.name" :value="p">{{ p.name }}</option>
+                                        </select>
+                                        <div v-if="selectedPreset" class="text-blue-300 text-xs mt-2 bg-blue-900/20 rounded p-2 border border-blue-700/30">
+                                            ℹ️ {{ selectedPreset.info }}
+                                        </div>
+                                    </div>
                                     <div>
                                         <label class="text-white text-sm font-medium mb-2 block">
                                             Stundenpreis Provider (€/Std)
@@ -281,8 +302,22 @@
                     stundenpreis: 1.30,
                     tokenProSekunde: 100,
                     verkaufspreisProMillion: 5.00,
-                    mwstSatz: 19
+                    mwstSatz: 19,
+                    selectedPreset: null,
+                    anbieterPresets: [
+                        { name: "Vast.ai (RTX 5090 Spot)", preis: 0.35, tps: 90, info: "Günstigster Marktplatz, schwankende Stabilität." },
+                        { name: "RunPod (RTX 4090 On-Demand)", preis: 0.45, tps: 85, info: "Sehr stabil, gute API, EU-Regionen verfügbar." },
+                        { name: "Scaleway (L40S Enterprise)", preis: 1.30, tps: 120, info: "Echte EU-Cloud, GDPR-konform, ideal für Parallelbetrieb." },
+                        { name: "SaladCloud (Consumer Grid)", preis: 0.25, tps: 70, info: "Extrem günstig, aber Jobs können unterbrochen werden." },
+                        { name: "Lokal (RTX 5090 Stromkosten)", preis: 0.28, tps: 95, info: "Deine Hardware (basiert auf 0,40€/kWh bei 700W)." }
+                    ],
+                    lastPriceUpdate: null,
+                    isLoadingPrices: true
                 }
+            },
+            mounted() {
+                // Live-Preise von GitHub laden
+                this.loadLivePrices();
             },
             computed: {
                 kostenProSekunde() {
@@ -344,6 +379,28 @@
                 formatNumber(num) {
                     if (!num || !isFinite(num)) return '0';
                     return Math.round(num).toLocaleString('de-DE');
+                },
+                applyPreset() {
+                    if (this.selectedPreset) {
+                        this.stundenpreis = this.selectedPreset.preis;
+                        this.tokenProSekunde = this.selectedPreset.tps;
+                    }
+                },
+                async loadLivePrices() {
+                    try {
+                        const response = await fetch('data/prices.json');
+                        const data = await response.json();
+                        
+                        if (data.presets && Array.isArray(data.presets)) {
+                            this.anbieterPresets = data.presets;
+                            this.lastPriceUpdate = data.last_updated;
+                            console.log('✅ Live-Preise geladen:', data.last_updated);
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Live-Preise nicht verfügbar, nutze Fallback-Werte', error);
+                    } finally {
+                        this.isLoadingPrices = false;
+                    }
                 }
             }
         }).mount('#app');
