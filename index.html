@@ -57,6 +57,71 @@
                                 </h3>
                                 
                                 <div class="space-y-4">
+                                    <!-- Token-Mix Slider -->
+                                    <div class="bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-purple-900/20 rounded-lg p-4 border border-purple-700/30">
+                                        <label class="text-white text-sm font-medium mb-3 block">
+                                            🎛️ Workload-Mix (Text vs. Audio)
+                                        </label>
+                                        <input
+                                            v-model.number="audioAnteil"
+                                            type="range"
+                                            min="0"
+                                            max="100"
+                                            class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+                                            style="background: linear-gradient(to right, #3b82f6 0%, #a855f7 100%);"
+                                        />
+                                        <div class="flex justify-between mt-2 text-xs">
+                                            <span class="text-blue-300">📝 {{ 100 - audioAnteil }}% Text</span>
+                                            <span class="text-purple-300">🎤 {{ audioAnteil }}% Audio</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Audio-Typ Auswahl -->
+                                    <div v-if="audioAnteil > 0" class="bg-purple-900/20 rounded-lg p-3 border border-purple-700/30">
+                                        <label class="text-white text-sm font-medium mb-2 block">
+                                            🎙️ Audio-Typ
+                                        </label>
+                                        <select 
+                                            v-model="audioTyp"
+                                            class="w-full bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                                        >
+                                            <option value="meeting">👥 Meeting (5-10 Personen)</option>
+                                            <option value="podcast">🎙️ Podcast / Hörbuch (durchgängig)</option>
+                                        </select>
+                                        <div class="text-purple-300 text-xs mt-2">
+                                            {{ audioTyp === 'meeting' ? '~9.000 Tokens/Std (40-45 Min effektive Sprechzeit)' : '~13.500 Tokens/Std (durchgängiges Sprechen)' }}
+                                        </div>
+                                    </div>
+
+                                    <!-- User-Output für 1M Token-Credits -->
+                                    <div class="bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-lg p-4 border border-purple-600/30">
+                                        <div class="text-slate-300 text-sm font-medium mb-3">
+                                            💎 Für 1.000.000 Token-Credits ({{ verkaufspreisProMillion.toFixed(2) }}€):
+                                        </div>
+                                        <div v-if="audioAnteil === 0" class="bg-blue-900/20 rounded-lg p-3 border border-blue-700/30">
+                                            <div class="text-blue-300 text-xs mb-1">📝 Nur Text-Verarbeitung</div>
+                                            <div class="text-blue-400 font-bold text-2xl">{{ formatNumber(effektiveTextTokens) }} Tokens</div>
+                                            <div class="text-slate-400 text-xs mt-1">≈ {{ userTextSeiten }} Seiten Text</div>
+                                        </div>
+                                        <div v-else-if="audioAnteil === 100" class="bg-purple-900/20 rounded-lg p-3 border border-purple-700/30">
+                                            <div class="text-purple-300 text-xs mb-1">🎤 Nur Audio-Verarbeitung (2x Faktor)</div>
+                                            <div class="text-purple-400 font-bold text-2xl">{{ userAudioStunden }} Std</div>
+                                            <div class="text-slate-400 text-xs mt-1">= {{ formatNumber(effektiveAudioTokens) }} echte Tokens ({{ audioTyp === 'meeting' ? 'Meetings' : 'Podcast/Hörbuch' }})</div>
+                                        </div>
+                                        <div v-else class="grid grid-cols-2 gap-3">
+                                            <div class="bg-blue-900/20 rounded-lg p-2 border border-blue-700/30">
+                                                <div class="text-blue-300 text-xs mb-1">📝 Text ({{ 100 - audioAnteil }}%)</div>
+                                                <div class="text-blue-400 font-bold">{{ formatNumber(effektiveTextTokens) }}</div>
+                                                <div class="text-slate-400 text-xs">≈ {{ userTextSeiten }} Seiten</div>
+                                            </div>
+                                            <div class="bg-purple-900/20 rounded-lg p-2 border border-purple-700/30">
+                                                <div class="text-purple-300 text-xs mb-1">🎤 Audio ({{ audioAnteil }}%)</div>
+                                                <div class="text-purple-400 font-bold">{{ userAudioStunden }} Std</div>
+                                                <div class="text-slate-400 text-xs">2x Faktor</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- Anbieter Preset Dropdown -->
                                     <div>
                                         <label class="text-white text-sm font-medium mb-2 flex items-center justify-between">
@@ -153,29 +218,6 @@
                     <!-- Results Section -->
                     <div class="border-t border-slate-700 pt-8 space-y-6">
                         
-                        <!-- 1000 Token Result -->
-                        <div class="bg-slate-700/50 rounded-lg p-5">
-                            <div class="text-slate-300 text-sm font-medium mb-3">
-                                💎 Pro 1.000 Token (1-3 KB Text)
-                            </div>
-                            <div class="grid grid-cols-3 gap-4">
-                                <div>
-                                    <div class="text-slate-400 text-xs mb-1">Kosten</div>
-                                    <div class="text-red-400 font-bold text-lg">{{ kostenPro1000 }} €</div>
-                                </div>
-                                <div>
-                                    <div class="text-slate-400 text-xs mb-1">Verkauf</div>
-                                    <div class="text-green-400 font-bold text-lg">{{ verkaufPro1000 }} €</div>
-                                </div>
-                                <div>
-                                    <div class="text-slate-400 text-xs mb-1">Gewinn</div>
-                                    <div :class="istGewinn ? 'text-green-400' : 'text-red-400'" class="font-bold text-lg">
-                                        {{ gewinnPro1000 }} €
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- 1 Million Token Result -->
                         <div class="bg-gradient-to-br from-blue-900/40 to-purple-900/40 rounded-xl p-6 border border-blue-500/30">
                             <div class="text-blue-300 text-sm font-medium mb-4">
@@ -223,14 +265,145 @@
                             </div>
                         </div>
 
-                        <!-- Info Box -->
-                        <div class="bg-amber-900/20 border border-amber-600/30 rounded-lg p-4 flex gap-3">
-                            <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <div class="text-amber-200 text-sm">
-                                <strong>Info:</strong> 1.000 Token entsprechen ca. 750-1.000 Wörtern oder 1-3 KB reinem Text. 
-                                Die MwSt. wird an das Finanzamt abgeführt und ist durchlaufender Posten (beeinflusst deinen Gewinn nicht).
+                        <!-- Credit-Paket Kalkulator -->
+                        <div class="bg-gradient-to-br from-purple-900/40 to-pink-900/40 rounded-xl p-8 border border-purple-500/30">
+                            <div class="text-purple-300 text-sm font-medium mb-6 flex items-center gap-2">
+                                💎 Credit-Paket-Kalkulation (bei {{ audioAnteil }}% Audio-Workload)
+                            </div>
+                            <div class="grid md:grid-cols-3 gap-6">
+                                <!-- Starter Paket -->
+                                <div class="bg-slate-800/50 rounded-lg p-5 border border-slate-700 hover:border-purple-500 transition-colors">
+                                    <div class="text-xs text-slate-400 mb-2 font-semibold">STARTER</div>
+                                    <div class="text-white font-bold text-lg mb-3">29€</div>
+                                    
+                                    <div class="space-y-3 text-xs mb-4 pb-4 border-b border-slate-600">
+                                        <div>
+                                            <div class="text-slate-400">5M Tokens</div>
+                                            <div class="text-slate-300 font-semibold">{{ paketKosten('starter') }}€ Kosten</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-slate-400">{{ paketMarge('starter') }}% Marge</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2 text-xs">
+                                        <div v-if="audioAnteil < 100">
+                                            <div class="text-blue-300">📝 Text</div>
+                                            <div class="text-blue-400 font-bold">{{ paketTextSeiten('starter') }} Seiten</div>
+                                        </div>
+                                        <div v-if="audioAnteil > 0">
+                                            <div class="text-purple-300">🎤 Audio</div>
+                                            <div class="text-purple-400 font-bold">{{ paketAudioStunden('starter') }} Std</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Business Paket -->
+                                <div class="bg-slate-800/50 rounded-lg p-5 border-2 border-green-500/50 hover:border-green-400 transition-colors ring-1 ring-green-500/20">
+                                    <div class="text-xs text-green-400 mb-2 font-semibold">⭐ BESTSELLER</div>
+                                    <div class="text-white font-bold text-lg mb-3">99€</div>
+                                    
+                                    <div class="space-y-3 text-xs mb-4 pb-4 border-b border-slate-600">
+                                        <div>
+                                            <div class="text-slate-400">20M Tokens</div>
+                                            <div class="text-slate-300 font-semibold">{{ paketKosten('business') }}€ Kosten</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-slate-400">{{ paketMarge('business') }}% Marge</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2 text-xs">
+                                        <div v-if="audioAnteil < 100">
+                                            <div class="text-blue-300">📝 Text</div>
+                                            <div class="text-blue-400 font-bold">{{ paketTextSeiten('business') }} Seiten</div>
+                                        </div>
+                                        <div v-if="audioAnteil > 0">
+                                            <div class="text-purple-300">🎤 Audio</div>
+                                            <div class="text-purple-400 font-bold">{{ paketAudioStunden('business') }} Std</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Pro Paket -->
+                                <div class="bg-slate-800/50 rounded-lg p-5 border border-slate-700 hover:border-purple-500 transition-colors">
+                                    <div class="text-xs text-slate-400 mb-2 font-semibold">PRO / API</div>
+                                    <div class="text-white font-bold text-lg mb-3">399€</div>
+                                    
+                                    <div class="space-y-3 text-xs mb-4 pb-4 border-b border-slate-600">
+                                        <div>
+                                            <div class="text-slate-400">100M Tokens</div>
+                                            <div class="text-slate-300 font-semibold">{{ paketKosten('pro') }}€ Kosten</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-slate-400">{{ paketMarge('pro') }}% Marge</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-2 text-xs">
+                                        <div v-if="audioAnteil < 100">
+                                            <div class="text-blue-300">📝 Text</div>
+                                            <div class="text-blue-400 font-bold">{{ paketTextSeiten('pro') }} Seiten</div>
+                                        </div>
+                                        <div v-if="audioAnteil > 0">
+                                            <div class="text-purple-300">🎤 Audio</div>
+                                            <div class="text-purple-400 font-bold">{{ paketAudioStunden('pro') }} Std</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Box mit Berechnungsgrundlagen -->
+                        <div class="bg-amber-900/20 border border-amber-600/30 rounded-lg p-4">
+                            <div class="flex gap-3 mb-3">
+                                <svg class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <div class="text-amber-200 text-sm flex-1">
+                                    <strong>Berechnungsgrundlagen:</strong> Der Slider zeigt den Workload-Mix deiner Kunden.
+                                </div>
+                                <button 
+                                    @click="showDetails = !showDetails"
+                                    class="text-amber-300 hover:text-amber-100 text-xs font-medium transition-colors"
+                                >
+                                    {{ showDetails ? '▲ Weniger' : '▼ Details' }}
+                                </button>
+                            </div>
+                            
+                            <div v-if="showDetails" class="text-amber-200 text-xs space-y-3 mt-4 pt-3 border-t border-amber-600/30">
+                                <div>
+                                    <strong class="text-amber-100">📝 Text-Tokens:</strong><br>
+                                    • 1 Token ≈ 3-4 Zeichen (Durchschnitt im Deutschen)<br>
+                                    • 1 Wort ≈ 1,3 Tokens (inkl. Leerzeichen & Satzzeichen)<br>
+                                    • 1 Seite (A4) ≈ 250-300 Wörter ≈ 1.500 Zeichen ≈ <strong>450 Tokens</strong><br>
+                                    • 1 Std intensive Nutzung ≈ <strong>5.000 Tokens</strong> (Chat-Konversation, Input + Output)<br>
+                                    • 1 Std Dokument-Analyse (kontinuierlich) ≈ 10.000 Tokens
+                                </div>
+                                
+                                <div>
+                                    <strong class="text-amber-100">🎤 Audio-Tokens:</strong><br>
+                                    • <strong>Meeting (5-10 Personen):</strong><br>
+                                    &nbsp;&nbsp;→ Effektive Sprechzeit: 40-45 Min (Pausen, Überlappungen)<br>
+                                    &nbsp;&nbsp;→ ~150 Wörter/Min × 42 Min ≈ 6.300 Wörter ≈ <strong>9.000 Tokens/Std</strong><br>
+                                    • <strong>Podcast/Hörbuch (durchgängig):</strong><br>
+                                    &nbsp;&nbsp;→ Kontinuierliches Sprechen: 60 Min<br>
+                                    &nbsp;&nbsp;→ ~150 Wörter/Min × 60 Min ≈ 9.000 Wörter ≈ <strong>13.500 Tokens/Std</strong>
+                                </div>
+                                
+                                <div>
+                                    <strong class="text-amber-100">💰 Kosten-Kalkulation:</strong><br>
+                                    • GPU-Kosten werden <strong>pro Stunde</strong> berechnet (nicht pro Token)<br>
+                                    • Token/Sekunde = Durchsatz deiner GPU (beeinflusst Batch-Geschwindigkeit)<br>
+                                    • Höherer Durchsatz = Mehr Material pro bezahlter GPU-Stunde = Niedrigere Kosten/Token
+                                </div>
+                                
+                                <div>
+                                    <strong class="text-amber-100">📊 Credit-Pakete:</strong><br>
+                                    • Margen basieren auf deinen aktuellen GPU-Kosten<br>
+                                    • Text/Audio-Split wird automatisch nach Slider-Position berechnet<br>
+                                    • MwSt. ist durchlaufender Posten (beeinflusst Gewinn nicht)
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -308,11 +481,15 @@
                         { name: "Vast.ai (RTX 5090 Spot)", preis: 0.35, tps: 90, info: "Günstigster Marktplatz, schwankende Stabilität." },
                         { name: "RunPod (RTX 4090 On-Demand)", preis: 0.45, tps: 85, info: "Sehr stabil, gute API, EU-Regionen verfügbar." },
                         { name: "Scaleway (L40S Enterprise)", preis: 1.30, tps: 120, info: "Echte EU-Cloud, GDPR-konform, ideal für Parallelbetrieb." },
+                        { name: "Scaleway (H100 Enterprise)", preis: 2.90, tps: 250, info: "Ultra-schnell, ideal für große Batch-Verarbeitung." },
                         { name: "SaladCloud (Consumer Grid)", preis: 0.25, tps: 70, info: "Extrem günstig, aber Jobs können unterbrochen werden." },
                         { name: "Lokal (RTX 5090 Stromkosten)", preis: 0.28, tps: 95, info: "Deine Hardware (basiert auf 0,40€/kWh bei 700W)." }
                     ],
                     lastPriceUpdate: null,
-                    isLoadingPrices: true
+                    isLoadingPrices: true,
+                    audioAnteil: 50,  // 0-100%, wie viel % der Workload ist Audio
+                    audioTyp: 'meeting',  // 'meeting' oder 'podcast'
+                    showDetails: false  // Info-Details ein-/ausklappen
                 }
             },
             mounted() {
@@ -373,6 +550,61 @@
                 },
                 minuten() {
                     return (this.sekundenFuerMillion / 60).toFixed(1);
+                },
+                textTokensProStunde() {
+                    // Text-Tokens die in 1 GPU-Stunde verarbeitet werden können
+                    return Math.round(this.tokenProSekunde * 3600);
+                },
+                audioStundenProGPUStunde() {
+                    // Wie viele Stunden Audio in 1 GPU-Stunde verarbeitet werden
+                    const tokensProStunde = this.tokenProSekunde * 3600;
+                    const tokensProAudioStunde = this.audioTyp === 'meeting' ? 9000 : 13500;
+                    return (tokensProStunde / tokensProAudioStunde).toFixed(1);
+                },
+                audioTokensProStunde() {
+                    // Audio-Tokens die verarbeitet werden (in 1 GPU-Stunde)
+                    const tokensProAudioStunde = this.audioTyp === 'meeting' ? 9000 : 13500;
+                    return Math.round(parseFloat(this.audioStundenProGPUStunde) * tokensProAudioStunde);
+                },
+                mixKapazitaet() {
+                    // Kombinierte Kapazität basierend auf Mix
+                    const textAnteil = (100 - this.audioAnteil) / 100;
+                    const audioAnteil = this.audioAnteil / 100;
+                    return Math.round((this.textTokensProStunde * textAnteil) + (this.audioTokensProStunde * audioAnteil));
+                },
+                textSeiten() {
+                    // 1 Seite ≈ 250-300 Wörter ≈ 1.500 Zeichen ≈ 450 Tokens (bei 3,3 Zeichen/Token)
+                    return Math.round(this.textTokensProStunde / 450);
+                },
+                effektiveTextTokens() {
+                    // Text-Anteil aus 1M Credits (Text zählt 1:1)
+                    const textAnteil = (100 - this.audioAnteil) / 100;
+                    return Math.round(1000000 * textAnteil);
+                },
+                effektiveAudioTokens() {
+                    // Audio-Anteil aus 1M Credits (Audio zählt 2:1)
+                    const audioAnteil = this.audioAnteil / 100;
+                    const audioCredits = 1000000 * audioAnteil;
+                    return Math.round(audioCredits / 2);  // Halbiert weil 2x Faktor
+                },
+                userAudioStunden() {
+                    // Wie viele Audio-Stunden bekommt der User für seine Audio-Tokens
+                    const tokensProAudioStunde = this.audioTyp === 'meeting' ? 9000 : 13500;
+                    return (this.effektiveAudioTokens / tokensProAudioStunde).toFixed(1);
+                },
+                userTextSeiten() {
+                    // Wie viele Seiten bekommt der User für seine Text-Tokens
+                    return Math.round(this.effektiveTextTokens / 450);
+                },
+                kostenFuerPaket() {
+                    // GPU-Kosten für Text + Audio Tokens
+                    const textKosten = (this.effektiveTextTokens / 1000000) * parseFloat(this.kostenProMillion);
+                    const audioKosten = (this.effektiveAudioTokens / 1000000) * parseFloat(this.kostenProMillion);
+                    return (textKosten + audioKosten).toFixed(2);
+                },
+                gewinnFuerPaket() {
+                    const gewinn = this.verkaufspreisProMillion - parseFloat(this.kostenFuerPaket);
+                    return gewinn.toFixed(2);
                 }
             },
             methods: {
@@ -401,6 +633,50 @@
                     } finally {
                         this.isLoadingPrices = false;
                     }
+                },
+                paketKosten(typ) {
+                    const pakete = {
+                        starter: 5,    // 5M Tokens
+                        business: 20,  // 20M Tokens
+                        pro: 100       // 100M Tokens
+                    };
+                    const millionen = pakete[typ];
+                    const kosten = millionen * parseFloat(this.kostenProMillion);
+                    return kosten.toFixed(2);
+                },
+                paketMarge(typ) {
+                    const pakete = {
+                        starter: { preis: 29, tokens: 5 },
+                        business: { preis: 99, tokens: 20 },
+                        pro: { preis: 399, tokens: 100 }
+                    };
+                    const paket = pakete[typ];
+                    const kosten = paket.tokens * parseFloat(this.kostenProMillion);
+                    const gewinn = paket.preis - kosten;
+                    const marge = (gewinn / paket.preis) * 100;
+                    return marge.toFixed(1);
+                },
+                paketTextStunden(typ) {
+                    const pakete = { starter: 5, business: 20, pro: 100 };
+                    const tokens = pakete[typ] * 1000000;
+                    const textAnteil = (100 - this.audioAnteil) / 100;
+                    const textTokens = tokens * textAnteil;
+                    // 1 Std intensive Nutzung ≈ 5.000 Tokens (Input + Output in Chat/Analyse)
+                    return (textTokens / 5000).toFixed(0);
+                },
+                paketTextSeiten(typ) {
+                    const pakete = { starter: 5, business: 20, pro: 100 };
+                    const tokens = pakete[typ] * 1000000;
+                    const textAnteil = (100 - this.audioAnteil) / 100;
+                    const textTokens = tokens * textAnteil;
+                    return Math.round(textTokens / 450);
+                },
+                paketAudioStunden(typ) {
+                    const pakete = { starter: 5, business: 20, pro: 100 };
+                    const tokens = pakete[typ] * 1000000;
+                    const audioAnteil = this.audioAnteil / 100;
+                    const audioTokens = tokens * audioAnteil;
+                    return (audioTokens / 13500).toFixed(0);
                 }
             }
         }).mount('#app');
