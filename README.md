@@ -45,6 +45,10 @@ python scripts/fetch_prices.py
 ### Audio-Tokens (2x Faktor)
 - **Meeting (5-10 Personen)** ≈ 9.000 Tokens/Std (40-45 Min effektive Sprechzeit)
 - **Podcast/Hörbuch** ≈ 13.500 Tokens/Std (kontinuierliches Sprechen)
+- **Vollservice Meeting** ≈ 35.000 Tokens/Std (Videoserver-Hosting + Transkription + KI-Protokollierung)
+  - 🖥️ Videoserver-Hosting: 1.000 Token/User/Std
+  - 🎤 Audio-Transkription: 18.200 Token/Std
+  - 🤖 KI-Protokollierung: 15.800 Token/Std
 - **2x Gewichtung**: Audio-Tokens sind doppelt so teuer (höherer Marktwert)
 
 **Beispiel bei 50/50 Mix:**

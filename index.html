@@ -87,9 +87,24 @@
                                         >
                                             <option value="meeting">👥 Meeting (5-10 Personen)</option>
                                             <option value="podcast">🎙️ Podcast / Hörbuch (durchgängig)</option>
+                                            <option value="fullservice">🚀 Vollservice Meeting (mit Protokoll)</option>
                                         </select>
                                         <div class="text-purple-300 text-xs mt-2">
-                                            {{ audioTyp === 'meeting' ? '~9.000 Tokens/Std (40-45 Min effektive Sprechzeit)' : '~13.500 Tokens/Std (durchgängiges Sprechen)' }}
+                                            <span v-if="audioTyp === 'meeting'">~9.000 Tokens/Std (40-45 Min effektive Sprechzeit)</span>
+                                            <span v-else-if="audioTyp === 'podcast'">~13.500 Tokens/Std (durchgängiges Sprechen)</span>
+                                            <span v-else-if="audioTyp === 'fullservice'">~35.000 Tokens/Std (Hosting + Transkription + KI-Protokoll)</span>
+                                        </div>
+                                        <!-- Aufschlüsselung Vollservice -->
+                                        <div v-if="audioTyp === 'fullservice'" class="mt-3 text-xs text-slate-300 bg-slate-900/40 rounded p-2 border border-purple-600/20">
+                                            <div class="font-medium text-purple-200 mb-1">📋 Komponenten (35.000 echte Tokens/Std):</div>
+                                            <div class="space-y-1 pl-2">
+                                                <div>🖥️ Hosting: 1.000 Token → 1.000 Credits</div>
+                                                <div>🎤 Audio: 18.200 Token → 36.400 Credits (2x)</div>
+                                                <div>🤖 Protokoll: 15.800 Token → 15.800 Credits</div>
+                                            </div>
+                                            <div class="mt-2 pt-2 border-t border-purple-600/20 text-amber-300 font-semibold">
+                                                💰 Gesamt: 53.200 Credits/Std
+                                            </div>
                                         </div>
                                     </div>
 
@@ -104,9 +119,9 @@
                                             <div class="text-slate-400 text-xs mt-1">≈ {{ userTextSeiten }} Seiten Text</div>
                                         </div>
                                         <div v-else-if="audioAnteil === 100" class="bg-purple-900/20 rounded-lg p-3 border border-purple-700/30">
-                                            <div class="text-purple-300 text-xs mb-1">🎤 Nur Audio-Verarbeitung (2x Faktor)</div>
+                                            <div class="text-purple-300 text-xs mb-1">🎤 Nur Audio-Verarbeitung</div>
                                             <div class="text-purple-400 font-bold text-2xl">{{ userAudioStunden }} Std</div>
-                                            <div class="text-slate-400 text-xs mt-1">= {{ formatNumber(effektiveAudioTokens) }} echte Tokens ({{ audioTyp === 'meeting' ? 'Meetings' : 'Podcast/Hörbuch' }})</div>
+                                            <div class="text-slate-400 text-xs mt-1">= {{ formatNumber(effektiveAudioTokens) }} echte Tokens ({{ audioTypLabel }})</div>
                                         </div>
                                         <div v-else class="grid grid-cols-2 gap-3">
                                             <div class="bg-blue-900/20 rounded-lg p-2 border border-blue-700/30">
@@ -558,13 +573,19 @@
                 audioStundenProGPUStunde() {
                     // Wie viele Stunden Audio in 1 GPU-Stunde verarbeitet werden
                     const tokensProStunde = this.tokenProSekunde * 3600;
-                    const tokensProAudioStunde = this.audioTyp === 'meeting' ? 9000 : 13500;
+                    const tokensProAudioStunde = this.getTokensProAudioStunde();
                     return (tokensProStunde / tokensProAudioStunde).toFixed(1);
                 },
                 audioTokensProStunde() {
                     // Audio-Tokens die verarbeitet werden (in 1 GPU-Stunde)
-                    const tokensProAudioStunde = this.audioTyp === 'meeting' ? 9000 : 13500;
+                    const tokensProAudioStunde = this.getTokensProAudioStunde();
                     return Math.round(parseFloat(this.audioStundenProGPUStunde) * tokensProAudioStunde);
+                },
+                audioTypLabel() {
+                    if (this.audioTyp === 'meeting') return 'Meetings';
+                    if (this.audioTyp === 'podcast') return 'Podcast/Hörbuch';
+                    if (this.audioTyp === 'fullservice') return 'Vollservice Meetings';
+                    return 'Audio';
                 },
                 mixKapazitaet() {
                     // Kombinierte Kapazität basierend auf Mix
@@ -582,15 +603,21 @@
                     return Math.round(1000000 * textAnteil);
                 },
                 effektiveAudioTokens() {
-                    // Audio-Anteil aus 1M Credits (Audio zählt 2:1)
+                    // Audio-Anteil aus 1M Credits
+                    // Berechnet die ECHTEN Tokens (nicht Credits)
                     const audioAnteil = this.audioAnteil / 100;
                     const audioCredits = 1000000 * audioAnteil;
-                    return Math.round(audioCredits / 2);  // Halbiert weil 2x Faktor
+                    const creditsProStunde = this.getCreditsProAudioStunde();
+                    const stunden = audioCredits / creditsProStunde;
+                    const tokensProStunde = this.getTokensProAudioStunde();
+                    return Math.round(stunden * tokensProStunde);
                 },
                 userAudioStunden() {
-                    // Wie viele Audio-Stunden bekommt der User für seine Audio-Tokens
-                    const tokensProAudioStunde = this.audioTyp === 'meeting' ? 9000 : 13500;
-                    return (this.effektiveAudioTokens / tokensProAudioStunde).toFixed(1);
+                    // Wie viele Audio-Stunden bekommt der User für seine Audio-Credits
+                    const audioAnteil = this.audioAnteil / 100;
+                    const audioCredits = 1000000 * audioAnteil;
+                    const creditsProStunde = this.getCreditsProAudioStunde();
+                    return (audioCredits / creditsProStunde).toFixed(1);
                 },
                 userTextSeiten() {
                     // Wie viele Seiten bekommt der User für seine Text-Tokens
@@ -608,6 +635,31 @@
                 }
             },
             methods: {
+                getTokensProAudioStunde() {
+                    if (this.audioTyp === 'meeting') return 9000;
+                    if (this.audioTyp === 'podcast') return 13500;
+                    if (this.audioTyp === 'fullservice') return 35000;
+                    return 9000; // Fallback
+                },
+                getCreditsProAudioStunde() {
+                    // Berechnet wie viele CREDITS eine Stunde Audio kostet
+                    if (this.audioTyp === 'meeting') {
+                        // 9.000 echte Tokens × 2 = 18.000 Credits
+                        return 9000 * 2;
+                    }
+                    if (this.audioTyp === 'podcast') {
+                        // 13.500 echte Tokens × 2 = 27.000 Credits
+                        return 13500 * 2;
+                    }
+                    if (this.audioTyp === 'fullservice') {
+                        // Audio-Transkription: 18.200 × 2 = 36.400 Credits
+                        // Hosting: 1.000 × 1 = 1.000 Credits
+                        // KI-Protokoll: 15.800 × 1 = 15.800 Credits
+                        // Gesamt: 53.200 Credits pro Stunde
+                        return (18200 * 2) + 1000 + 15800;
+                    }
+                    return 18000; // Fallback (Meeting)
+                },
                 formatNumber(num) {
                     if (!num || !isFinite(num)) return '0';
                     return Math.round(num).toLocaleString('de-DE');
@@ -673,10 +725,11 @@
                 },
                 paketAudioStunden(typ) {
                     const pakete = { starter: 5, business: 20, pro: 100 };
-                    const tokens = pakete[typ] * 1000000;
+                    const credits = pakete[typ] * 1000000;
                     const audioAnteil = this.audioAnteil / 100;
-                    const audioTokens = tokens * audioAnteil;
-                    return (audioTokens / 13500).toFixed(0);
+                    const audioCredits = credits * audioAnteil;
+                    const creditsProStunde = this.getCreditsProAudioStunde();
+                    return (audioCredits / creditsProStunde).toFixed(0);
                 }
             }
         }).mount('#app');
