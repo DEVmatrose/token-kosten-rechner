@@ -151,6 +151,7 @@ MIT License - Nutze das Tool frei für kommerzielle und private Zwecke!
 - **Website**: [ogerly.github.io/devmatrose](https://ogerly.github.io/devmatrose/)
 - **GitHub**: [@DEVmatrose](https://github.com/DEVmatrose)
 - **Live-Demo**: [Token Kosten-Rechner](https://devmatrose.github.io/token-kosten-rechner/)
+- **Live-Demo**: [Video-Service-Strategie-Planer](https://devmatrose.github.io/token-kosten-rechner/Video-Service-Strategie-Planer.html)
 
 ---
 
