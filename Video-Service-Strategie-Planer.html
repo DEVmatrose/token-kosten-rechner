@@ -57,24 +57,6 @@
                     
                     <div class="space-y-6">
                         <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-2">Meeting-Typ</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <button 
-                                    @click="scenario = 'meeting'" 
-                                    :class="scenario === 'meeting' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800 text-slate-400 border-slate-700'"
-                                    class="py-2 px-3 rounded-lg border text-sm transition-all">
-                                    Team Meeting
-                                </button>
-                                <button 
-                                    @click="scenario = 'webinar'" 
-                                    :class="scenario === 'webinar' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800 text-slate-400 border-slate-700'"
-                                    class="py-2 px-3 rounded-lg border text-sm transition-all">
-                                    Webinar
-                                </button>
-                            </div>
-                        </div>
-
-                        <div>
                             <label class="block text-sm font-medium text-slate-300 mb-2">System-Wahl</label>
                             <select v-model="system" class="w-full bg-slate-800 border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
                                 <option value="jitsi">Jitsi Meet (Ressourceneffizient)</option>
@@ -278,7 +260,6 @@
         createApp({
             data() {
                 return {
-                    scenario: 'meeting',
                     system: 'jitsi',
                     participants: 10,
                     duration: 60,
@@ -295,11 +276,6 @@
                 loadPercentage() {
                     let baseLoad = 5; // Idle
                     let perUserLoad = this.system === 'jitsi' ? 0.4 : 0.8;
-                    
-                    if (this.scenario === 'webinar') {
-                        // Im Webinar-Modus (nur 1 Sprecher) sinkt die CPU Last massiv
-                        perUserLoad = this.system === 'jitsi' ? 0.1 : 0.25;
-                    }
                     
                     let load = baseLoad + (this.participants * perUserLoad);
                     if (this.withAI) load += 15; // Jibri/Recording Bot Last

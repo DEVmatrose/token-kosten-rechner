@@ -58,12 +58,24 @@ python scripts/fetch_prices.py
 
 ## 🎥 Video-Service-Strategie-Planer
 
-Zusätzlich zum Token-Kosten-Rechner gibt es einen spezialisierten **Video-Service-Strategie-Planer**:
+Zusätzlich zum Token-Kosten-Rechner gibt es einen spezialisierten **Video-Service-Strategie-Planer** für Videokonferenz-Services:
 
-- **📊 Server-Auslastung**: Berechnet CPU/RAM-Last für Jitsi & BigBlueButton
-- **💰 Wirtschaftlichkeits-Check**: Automatische Kalkulation von Selbstkosten vs. Erlös
-- **👥 Skalierungs-Simulation**: Teste verschiedene Meeting-Szenarien (Team/Webinar)
+### Features
+- **📊 Server-Auslastung**: Berechnet CPU/RAM-Last für Jitsi Meet & BigBlueButton
+- **💰 Wirtschaftlichkeits-Check**: Kalkulation von Selbstkosten vs. Endkundenpreise
+- **👥 Skalierungs-Simulation**: Teste verschiedene Teilnehmerzahlen (1-500 User)
 - **🎯 Entscheidungshilfe**: Vergleich Jitsi Meet vs. BigBlueButton Features
+
+### Token-Abrechnung
+- **Hosting**: 1.000 Token/User/Std (Abrechnung im **15-Minuten-Takt**, aufgerundet)
+- **KI-Protokoll Pipeline** (optional, pro Stunde):
+  - 🎥 FFmpeg Verarbeitung: 6.000 Token
+  - 🎵 Rauschfilter & Stimmoptimierung: 7.000 Token
+  - 🎤 Audio-zu-Text (STT): 13.000 Token
+  - 📋 Voxtral Meetingprotokoll: 13.000 Token
+  - **Gesamt KI**: 39.000 Token/Std
+
+**Pauschale Abrechnung:** Jedes Meeting wird gleich abgerechnet, unabhängig davon, wie viel tatsächlich gesprochen wurde.
 
 [→ Video-Service-Strategie-Planer öffnen](Video-Service-Strategie-Planer.html)
 
