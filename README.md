@@ -2,6 +2,9 @@
 
 Berechne deine GPU-Token-Kosten, Arbitrage-Marge und Credit-Pakete in Echtzeit mit **automatisch aktualisierten Live-Preisen** von 6 GPU-Anbietern.
 
+<img width="1397" height="1261" alt="image" src="https://github.com/user-attachments/assets/27b4969e-d34c-4d92-87b7-704ebbfa4c7d" />
+
+
 ## ✨ Features
 
 - **🎯 Live GPU-Preise**: Automatisch aktualisierte Preise von 6 Anbietern (4x täglich)
@@ -59,6 +62,9 @@ python scripts/fetch_prices.py
 ## 🎥 Video-Service-Strategie-Planer
 
 Zusätzlich zum Token-Kosten-Rechner gibt es einen spezialisierten **Video-Service-Strategie-Planer** für Videokonferenz-Services:
+
+<img width="1467" height="922" alt="image" src="https://github.com/user-attachments/assets/623d449f-d9b7-45c3-a4c4-86f75d4d44ea" />
+
 
 ### Features
 - **📊 Server-Auslastung**: Berechnet CPU/RAM-Last für Jitsi Meet & BigBlueButton
