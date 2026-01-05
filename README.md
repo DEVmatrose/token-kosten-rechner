@@ -56,6 +56,19 @@ python scripts/fetch_prices.py
 - Bekommt: 500k Text-Tokens + 250k Audio-Tokens (wegen 2x Faktor)
 - Entspricht: ~1.111 Seiten Text ODER ~28 Std Meetings
 
+## 🎥 Video-Service-Strategie-Planer
+
+Zusätzlich zum Token-Kosten-Rechner gibt es einen spezialisierten **Video-Service-Strategie-Planer**:
+
+- **📊 Server-Auslastung**: Berechnet CPU/RAM-Last für Jitsi & BigBlueButton
+- **💰 Wirtschaftlichkeits-Check**: Automatische Kalkulation von Selbstkosten vs. Erlös
+- **👥 Skalierungs-Simulation**: Teste verschiedene Meeting-Szenarien (Team/Webinar)
+- **🎯 Entscheidungshilfe**: Vergleich Jitsi Meet vs. BigBlueButton Features
+
+[→ Video-Service-Strategie-Planer öffnen](Video-Service-Strategie-Planer.html)
+
+---
+
 ## 💎 Credit-Paket System
 
 Verkaufe nicht Roh-Tokens, sondern **Credits** mit verschiedenen Paketen:

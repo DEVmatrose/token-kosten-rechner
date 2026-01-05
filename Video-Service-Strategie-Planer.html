@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video-Service Strategie-Planer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .glass-card {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans">
+    <div id="app" class="min-h-screen pb-20">
+        <!-- Header -->
+        <header class="border-b border-slate-800 bg-slate-900/50 sticky top-0 z-50 backdrop-blur-md">
+            <div class="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-600 rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white leading-tight">Video-Service Strategie-Planer</h1>
+                        <p class="text-xs text-slate-400">Entscheidungshilfe & Kostenkalkulation für Auftraggeber</p>
+                    </div>
+                </div>
+                <div class="flex gap-4 text-sm items-center">
+                    <a href="index.html" class="flex items-center gap-2 px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg transition-colors text-purple-400 hover:text-purple-300 text-xs">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        Token-Rechner
+                    </a>
+                    <div class="flex flex-col items-end">
+                        <span class="text-slate-500 uppercase text-[10px] font-bold tracking-wider">Basis-Infrastruktur</span>
+                        <span class="text-blue-400 font-mono">Hetzner AX-Serie (50€/Mt.)</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-6 py-8 grid lg:grid-cols-12 gap-8">
+            
+            <!-- Linke Spalte: Konfiguration -->
+            <div class="lg:col-span-4 space-y-6">
+                <section class="glass-card rounded-2xl p-6">
+                    <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
+                        Szenario definieren
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Meeting-Typ</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button 
+                                    @click="scenario = 'meeting'" 
+                                    :class="scenario === 'meeting' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800 text-slate-400 border-slate-700'"
+                                    class="py-2 px-3 rounded-lg border text-sm transition-all">
+                                    Team Meeting
+                                </button>
+                                <button 
+                                    @click="scenario = 'webinar'" 
+                                    :class="scenario === 'webinar' ? 'bg-blue-600 text-white border-blue-500' : 'bg-slate-800 text-slate-400 border-slate-700'"
+                                    class="py-2 px-3 rounded-lg border text-sm transition-all">
+                                    Webinar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">System-Wahl</label>
+                            <select v-model="system" class="w-full bg-slate-800 border-slate-700 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                <option value="jitsi">Jitsi Meet (Ressourceneffizient)</option>
+                                <option value="bbb">BigBlueButton (Pädagogisch)</option>
+                            </select>
+                            <p class="mt-2 text-[11px] text-slate-400">
+                                {{ system === 'jitsi' ? '💡 Ideal für schnelle Calls und hohe Userzahlen pro Server.' : '💡 Beste Wahl für Schule/Uni (Whiteboard, Breakouts).' }}
+                            </p>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-800">
+                            <div class="flex justify-between mb-2">
+                                <label class="text-sm font-medium text-slate-300">Teilnehmer</label>
+                                <span class="text-blue-400 font-bold">{{ participants }} Pers.</span>
+                            </div>
+                            <input type="range" v-model.number="participants" min="1" :max="maxParticipants" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-sm font-medium text-slate-300">Dauer (Minuten)</label>
+                                <span class="text-blue-400 font-bold">{{ duration }} Min.</span>
+                            </div>
+                            <input type="range" v-model.number="duration" min="5" max="180" step="5" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-slate-900/50 rounded-xl border border-slate-800">
+                            <span class="text-sm text-slate-300">KI-Protokoll inkludieren?</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" v-model="withAI" class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-card rounded-2xl p-6 border-l-4 border-l-amber-500">
+                    <h2 class="text-sm font-bold text-amber-500 uppercase tracking-widest mb-4">Ihre Margen-Vorgabe</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[11px] text-slate-500 block mb-1">Verkaufspreis pro 1 Mio. Token (€)</label>
+                            <input type="number" v-model.number="salePricePerMillion" class="w-full bg-slate-800 border-slate-700 rounded-lg px-3 py-2 text-white">
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Rechte Spalte: Analyse -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- Server Auslastungs-Grafik -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-sm font-semibold text-slate-400 mb-4">Server-Auslastung (CPU/RAM)</h3>
+                        <div class="relative pt-1">
+                            <div class="flex mb-2 items-center justify-between">
+                                <div>
+                                    <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full" :class="loadColorClass">
+                                        {{ loadPercentage }}% Last
+                                    </span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-semibold inline-block text-slate-400">
+                                        {{ system === 'jitsi' ? 'Jitsi SFU Bridge' : 'BBB Node.js Stack' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-slate-800">
+                                <div :style="{width: loadPercentage + '%'}" :class="loadBarClass" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center transition-all duration-500"></div>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-slate-500">
+                            *Geschätzt auf Basis von 8-Kern CPU & 16GB RAM. Bei >90% Last drohen Paketverluste.
+                        </p>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 flex flex-col justify-center">
+                        <h3 class="text-sm font-semibold text-slate-400 mb-2">Token-Verbrauch dieses Meetings</h3>
+                        <div class="text-3xl font-bold text-white mb-1">
+                            {{ formatNumber(totalTokens) }} <span class="text-blue-500 text-sm">Tokens</span>
+                        </div>
+                        <div class="flex gap-4 text-[11px] text-slate-400">
+                            <span>Host: {{ formatNumber(hostingTokens) }}</span>
+                            <span v-if="withAI">KI: {{ formatNumber(aiTokens) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wirtschaftlichkeits-Check -->
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="p-6 border-b border-slate-800 bg-slate-900/30">
+                        <h3 class="text-lg font-bold text-white">Wirtschaftlichkeits-Check</h3>
+                    </div>
+                    <div class="p-8">
+                        <div class="grid md:grid-cols-3 gap-8">
+                            <div class="text-center">
+                                <div class="text-slate-500 text-xs uppercase font-bold mb-1">Selbstkosten (Infrastr.)</div>
+                                <div class="text-2xl font-bold text-red-400">{{ costPerMeeting.toFixed(4) }} €</div>
+                                <div class="text-[10px] text-slate-600 mt-1">Nur Server-Anteil & GPU</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-slate-500 text-xs uppercase font-bold mb-1">Erlös für Kunden</div>
+                                <div class="text-2xl font-bold text-green-400">{{ revenuePerMeeting.toFixed(2) }} €</div>
+                                <div class="text-[10px] text-slate-600 mt-1">Basierend auf Token-Guthaben</div>
+                            </div>
+                            <div class="text-center bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
+                                <div class="text-blue-400 text-xs uppercase font-bold mb-1">Ihre Marge</div>
+                                <div class="text-3xl font-black text-white">{{ profitMargin.toFixed(1) }} %</div>
+                                <div class="text-[10px] text-blue-500/70 mt-1">Arbitrage-Gewinn</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entscheidungshilfe-Tabelle -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="glass-card rounded-2xl p-6 border-t-4 border-t-blue-500">
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            ✅ Warum Jitsi Meet?
+                        </h4>
+                        <ul class="text-sm text-slate-400 space-y-3">
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-500">✔</span>
+                                <span>Höhere Skalierung (bis zu 500 Zuschauer auf einem Server).</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-500">✔</span>
+                                <span>Geringere Latenz für internationale Teilnehmer.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-500">✔</span>
+                                <span>Schnellster Start (Ein Klick ohne Login).</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 border-t-4 border-t-purple-500">
+                        <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                            🎓 Warum BigBlueButton?
+                        </h4>
+                        <ul class="text-sm text-slate-400 space-y-3">
+                            <li class="flex items-start gap-2">
+                                <span class="text-purple-500">●</span>
+                                <span>Interaktives Whiteboard & PDF-Präsentation nativ.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-purple-500">●</span>
+                                <span>Breakout-Rooms für strukturierte Workshops.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-purple-500">●</span>
+                                <span>Lehrer-Dashboard zur Überwachung der Teilnahme.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Profi-Tipp -->
+                <div class="bg-amber-900/20 border border-amber-600/30 rounded-2xl p-6 flex gap-4">
+                    <div class="text-2xl">💡</div>
+                    <div class="text-sm text-amber-200">
+                        <strong>Skalierungs-Tipp:</strong> Wenn Sie 1.000 User gleichzeitig bedienen wollen, benötigen Sie ca. 4-5 Instanzen der AX42-Serie. Über ein Token-Guthaben-Modell finanzieren die Power-User (mit viel Video) die Gelegenheitsnutzer quer, was die Gesamtkosten für die Auftraggeberin extrem stabil hält.
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    scenario: 'meeting',
+                    system: 'jitsi',
+                    participants: 10,
+                    duration: 60,
+                    withAI: true,
+                    salePricePerMillion: 10.00, // Standard Verkaufspreis
+                    serverCostMonth: 50.00,
+                    gpuCostPerHour: 0.45 // RunPod RTX 4090 Basis
+                }
+            },
+            computed: {
+                maxParticipants() {
+                    return this.system === 'jitsi' ? 500 : 250;
+                },
+                loadPercentage() {
+                    let baseLoad = 5; // Idle
+                    let perUserLoad = this.system === 'jitsi' ? 0.4 : 0.8;
+                    
+                    if (this.scenario === 'webinar') {
+                        // Im Webinar-Modus (nur 1 Sprecher) sinkt die CPU Last massiv
+                        perUserLoad = this.system === 'jitsi' ? 0.1 : 0.25;
+                    }
+                    
+                    let load = baseLoad + (this.participants * perUserLoad);
+                    if (this.withAI) load += 15; // Jibri/Recording Bot Last
+                    
+                    return Math.min(100, Math.round(load));
+                },
+                loadColorClass() {
+                    if (this.loadPercentage < 60) return 'bg-green-500/20 text-green-400';
+                    if (this.loadPercentage < 85) return 'bg-amber-500/20 text-amber-400';
+                    return 'bg-red-500/20 text-red-400';
+                },
+                loadBarClass() {
+                    if (this.loadPercentage < 60) return 'bg-green-500';
+                    if (this.loadPercentage < 85) return 'bg-amber-500';
+                    return 'bg-red-500';
+                },
+                hostingTokens() {
+                    // 1.000 Token pro User pro Stunde
+                    const hours = this.duration / 60;
+                    return Math.round(this.participants * 1000 * hours);
+                },
+                aiTokens() {
+                    if (!this.withAI) return 0;
+                    // Fixe 34.000 Token pro Meeting-Stunde (Transkription + Protokoll)
+                    const hours = this.duration / 60;
+                    return Math.round(34000 * hours);
+                },
+                totalTokens() {
+                    return this.hostingTokens + this.aiTokens;
+                },
+                costPerMeeting() {
+                    // Kalkulation der echten Produktionskosten
+                    const hours = this.duration / 60;
+                    
+                    // Anteil an den 50€ Serverkosten (angenommen 720h/Monat)
+                    const serverShare = (this.serverCostMonth / 720) * hours;
+                    
+                    // GPU Kosten
+                    const aiCost = this.withAI ? (this.gpuCostPerHour * hours * 0.1) : 0; // 0.1 Faktor weil GPU schneller als Echtzeit
+                    
+                    return serverShare + aiCost;
+                },
+                revenuePerMeeting() {
+                    return (this.totalTokens / 1000000) * this.salePricePerMillion;
+                },
+                profitMargin() {
+                    if (this.revenuePerMeeting === 0) return 0;
+                    const profit = this.revenuePerMeeting - this.costPerMeeting;
+                    return (profit / this.revenuePerMeeting) * 100;
+                }
+            },
+            methods: {
+                formatNumber(num) {
+                    return num.toLocaleString('de-DE');
+                }
+            },
+            watch: {
+                system(newVal) {
+                    if (newVal === 'bbb' && this.participants > 250) {
+                        this.participants = 250;
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
