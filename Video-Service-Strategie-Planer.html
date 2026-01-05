@@ -168,7 +168,7 @@
                         </div>
                         
                         <div class="mt-3 pt-3 border-t border-slate-700 text-[10px] text-slate-500">
-                            * Hosting wird im 15-Minuten-Takt abgerechnet (aufgerundet). Der Einladende trägt die Kosten für alle Teilnehmer.
+                            * Hosting wird im 15-Minuten-Takt abgerechnet (aufgerundet). KI-Pipeline wird minutengenau nach tatsächlicher Audio-Länge berechnet. Der Einladende trägt die Kosten.
                         </div>
                     </div>
                 </div>
@@ -303,27 +303,23 @@
                 },
                 ffmpegTokens() {
                     if (!this.withAI) return 0;
-                    // FFmpeg Verarbeitung: 6.000 Token pro Stunde
-                    const hours = this.duration / 60;
-                    return Math.round(6000 * hours);
+                    // FFmpeg Verarbeitung: 6.000 Token/Std = 100 Token/Min
+                    return Math.round(this.duration * 100);
                 },
                 audioEnhanceTokens() {
                     if (!this.withAI) return 0;
-                    // Rauschfilter & Stimmoptimierung: 7.000 Token pro Stunde
-                    const hours = this.duration / 60;
-                    return Math.round(7000 * hours);
+                    // Rauschfilter & Stimmoptimierung: 7.000 Token/Std = ~117 Token/Min
+                    return Math.round(this.duration * 116.67);
                 },
                 sttTokens() {
                     if (!this.withAI) return 0;
-                    // Audio-zu-Text: 13.000 Token pro Stunde
-                    const hours = this.duration / 60;
-                    return Math.round(13000 * hours);
+                    // Audio-zu-Text: 13.000 Token/Std = ~217 Token/Min
+                    return Math.round(this.duration * 216.67);
                 },
                 voxtralTokens() {
                     if (!this.withAI) return 0;
-                    // Voxtral Meetingprotokoll: 13.000 Token pro Stunde
-                    const hours = this.duration / 60;
-                    return Math.round(13000 * hours);
+                    // Voxtral Meetingprotokoll: 13.000 Token/Std = ~217 Token/Min
+                    return Math.round(this.duration * 216.67);
                 },
                 aiTokens() {
                     // Summe aller KI-Komponenten
